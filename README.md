@@ -45,9 +45,11 @@ Most linguistics
 
 * [Wordnet Quality Control](https://github.com/omwn/omwn.github.io/discussions/10) (for all languages in OMW)
   * Dominik, Vojtěch
-  * map lemmas to examples
-		* Japanese --- also try to add missing
-	* try to mark lexicalization
+  * make merged wordnet with reduced graph <https://gwc2014.ut.ee/proceedings_of_GWC_2014.pdf#page=128>
+  * merge in TUFS wordnets
+  * map lemmas to examples (mainly done in CygNet) <https://github.com/rowanhm/cygnet>
+ 	* Japanese --- also try to add missing
+  * try to mark lexicalization
 
 Most multilingual
 
