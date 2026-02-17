@@ -15,8 +15,16 @@ something new.
 * You will split yourselves into teams (4x2?) 
 * Most weeks, I will meet each team for 30 minutes  
     * I will give you more scaffolding
+      
+| Time         | Group | People |
+|--------------|-------|--------|
+| 13:15–13:45  | WSD   | Vira   |
+| 13:45–14:15  | LCM   | Barbora, Lea Karolina  |
+| 14:15–14:45  | Metaphor  | Jakub, Zuzana   |
+| 14:45–15:15  | Wordnet   |  Dominik, Vojtěch  |
+
 * Once every 4 weeks, you will prepare a 20-minute presentation to the other teams
- 
+  * Next presentation Feb 05 
 
 ### Tasks
 
