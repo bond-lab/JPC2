@@ -12,24 +12,26 @@ something new.
 
 ### Approach
 
-* You will split yourselves into teams (4x2?) 
-* Most weeks, I will meet each team for 30 minutes  
+* We will work in teams (4x1--2) 
+* Most weeks, I will meet each team for 30 minutes in my office (3.22) 
     * I will give you more scaffolding
       
-| Time         | Group | People |
-|--------------|-------|--------|
-| 13:15–13:45  | WSD   | Vira   |
-| 13:45–14:15  | LCM   | Barbora, Lea Karolina  |
-| 14:15–14:45  | Metaphor  | Jakub, Zuzana   |
-| 14:45–15:15  | Wordnet   |  Dominik, Vojtěch  |
+| Time         | Group    | People |
+|--------------|----------|--------|
+| 12:45–13:15  | Wordnet  | Dominik, Vojtěch  |
+| 13:15–13:45  | WSD      | Vira   |
+| 13:45–14:15  | LCM      | Barbora, Lea Karolina  |
+| 14:15–14:45  | Metaphor | Zuzana   |
 
-* Once every 4 weeks, you will prepare a 20-minute presentation to the other teams
-  * Next presentation Feb 05 
+
+* Once every 4 weeks, you will prepare a 20-minute presentation to the other teams (in 2.05).
+  * Next presentation Mar 05 
 
 ### Tasks
 
-* WSD --- we got some nice results for models, and have a good evaluation script.  I also have made some progress on makign a server accesible.
+* WSD --- we got some nice results for models, and have a good evaluation script.  
   * Vira
+  * There is a server accessible.
   * create a test harness to test improvements
   * run with different contexts and models
   * try to fix the MWE problem
