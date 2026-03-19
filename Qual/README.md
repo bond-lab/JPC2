@@ -1,24 +1,10 @@
 
 
-## next steps
 
-- Example parsing
-  - add data to wordnets
-  - try to find missing Japanese lemmas
-      - add with reduced confidence
-  - report statistics (and examples, good and bad)
-  
-- Merge expand wordnet and source
-  - read paper <https://gwc2014.ut.ee/proceedings_of_GWC_2014.pdf#page=128>
-  - try it!
-  
-- try to mark lexicalizatoin
 
-## resources
 
-Wordnet editor: <https://github.com/bond-lab/wn_edit>
+## an interesting paper
 
-Curated Wordnets: <https://github.com/omwn/curated-wordnets>
+https://aclanthology.org/2022.coling-1.7.pdf
 
-Japanese Dictionary: <https://github.com/neocl/jamdict>
-
+You could try this approach, without the WSD step (as we have ChainNet as training data).  The author is a friend, so if you have questions, we an ask him.
