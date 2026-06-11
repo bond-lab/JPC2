@@ -1,7 +1,10 @@
 # JPC2
 Project Activity 2
 
-
+**Final Deadline** June 30, 2026
+ * upload report (PDF)
+ * code and data
+ * notes on how to run the code
 
 ## Plan for this semester
 
