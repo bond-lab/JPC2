@@ -67,3 +67,41 @@ Most multilingual
 * by 02-17 finalize groups, 
 * Make task README.md
 * write task description, outline next steps
+
+## Final Write up
+
+Write a short (6-10 page) paper in LaTeX, describing what you did, how you did it, what problems you had and what remains to be done.  References and appendices don't count toward the page total.   Upload the paper in LaTeX and PDF, along with all all code and any data you created (e.g. for evaluations) to github.
+
+I give a rough example in <https://github.com/bond-lab/JPC1/tree/main/tasks/wordnet>.  it is slightly too long, I should make some graphs smaller.
+
+
+### Structure of paper
+
+* Title, authors, contact, date, class (Top of first page)
+
+* Introduction: what are you trying to do and why, has anyone else worked on this before (2-3p)
+
+* Method:  How are you solving the problem, what is your approach (1-3 p)
+
+* Results and Evaluation: What are your results, how well did you do  (1-3 p)
+    * you should have some comparison to a human test set (you can make it)
+	* you should give numerical results --- how many analyzed, what result for what approach
+
+* Discussion: (1-3 p)
+    * what approach worked best
+	* what did you try that is new
+	* what would you like to try but couldn't
+
+* Conclusions (0.5p)
+    * summary of what you did, what your results were, what remains to be done.  Someone should be able to read this without reading the whole paper 
+	
+* References
+
+* Appendices (optional)
+    * If there are more details you want to go into, but didn't have room.  The paper should be  understandable without reading the appendices
+	
+	
+### Structure of files
+
+You should have a `README.md` that lists all the files and explains how to run your code.  If it requires other modules, list them in `requirements.txt`.  
+
