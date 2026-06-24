@@ -1,7 +1,10 @@
 # JPC2
 Project Activity 2
 
-
+**Final Deadline** June 30, 2026
+ * upload report (PDF)
+ * code and data
+ * notes on how to run the code
 
 ## Plan for this semester
 
@@ -25,7 +28,9 @@ something new.
 
 
 * Once every 4 weeks, you will prepare a 20-minute presentation to the other teams (in 2.05).
-  * Next presentation Mar 05 
+  * On Tue April the 16th, we will not have a meeting
+  * On Tue April the 23rd, we will meet in the morning 10am wordnet, 10:30 WSD, 11:00 LCM, 11:30 Metaphor. 
+  * Next presentation Apr 30
 
 ### Tasks
 
