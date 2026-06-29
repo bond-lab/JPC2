@@ -16,3 +16,5 @@ Before running the pipeline, ensure you have the `wn` library installed:
 
 ```bash
 pip install wn
+
+python metaphor_full_pipeline_final.py --mode chainnet
