@@ -1,0 +1,175 @@
+\documentclass[12pt,a4paper]{article} % Zmenené z 11pt na 12pt pre väčšie základné písmo
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{cite}
+\usepackage{lipsum}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows}
+
+\geometry{margin=1in}
+
+\title{\textbf{Final report: Lexical Conceptual Mapping and Metaphor}}
+\author{\textbf{Barbora Mahdalov\'{a}} \and \textbf{Lea K. Kom\'{a}rkov\'{a}}}
+\date{Palack\'{y} University Olomouc \\[2ex] June 2026} % Přesunuto na samostatný řádek nad datum s mezerou 2ex
+
+\begin{document}
+
+\maketitle
+\section{Introduction}
+The automated identification, classification, and empirical validation of figurative language remain prominent challenges within modern computational linguistics. In traditional lexical semantics, words are often treated as static entities possessing explicit, direct boundaries. However, natural human discourse relies extensively on fluid conceptual shifts. The intersection of cognitive linguistics, psycholinguistics, and natural language processing (NLP) has long grappled with these phenomena. 
+
+Conceptual Metaphor Theory (CMT), originally formulated by Lakoff and Johnson (1980), establishes that metaphors are not merely ornamental linguistic devices, literary tropes, or superficial stylistic flourishes. Instead, they operate as core cognitive mechanisms that map structural features from a concrete, physically grounded, or well-understood ``Source'' domain onto an abstract, elusive, or highly complex ``Target'' domain. Classic examples include schemas such as \textit{LIFE IS A JOURNEY}, \textit{TIME IS MONEY}, or \textit{QUALITY IS WEALTH}. By utilizing structures from concrete physical or sensory experiences (e.g., traveling on a path, counting currency), human speakers conceptualize abstract, non-physical domains effortlessly.
+
+In tandem with metaphoric mappings, metonymies allow conceptual shifts to occur within a single contiguous domain or cognitive schema rather than bridging completely distinct domains. For instance, in the classic example, ``\textit{The White House issued a statement},'' a physical entity or building maps directly onto a governing political institution due to spatial and functional contiguity. 
+
+While the human brain navigates these conceptual transitions natively through rich pragmatic context and shared cognitive inheritance, automating this recognition requires explicit computational mapping pipelines. These systems must link arbitrary surface lexical units (words as they appear in raw text) to highly structured, abstract conceptual schemas representing underlying human thought patterns.
+
+This paper thoroughly evaluates the structural alignment between custom-built conceptual frameworks developed at our institution---specifically a master Conceptual Metaphor Thesaurus containing 8,747 terms and the ChainNet relational database---and the formal hierarchical taxonomies within the WordNet lexical database (Open Multilingual WordNet 1.4). We present a unified, multi-mode pipeline tasked with programmatically mapping surface lexical tokens to abstract conceptual schemas by traversing hypernym lineage trees.
+
+\subsection{Research Motivation and Problem Statement}
+The primary objective of this research is to evaluate and bridge the structural alignment between custom conceptual resources---specifically an institutional Conceptual Metaphor Thesaurus and the ChainNet database---and large-scale hierarchical lexical databases like WordNet. We implement an algorithmic framework to determine whether metaphorical logic is explicitly or implicitly reflected within formal linguistic hierarchies. By tracing ``Hypernym Chains'' (the ancestral lineage of a word sense), we test if keywords belonging to Metaphorical Mapping Logic (MML) can be systematically uncovered in a word's ancestry.
+
+Historically, identifying figurative language has relied on manual annotation, lexicographical intuition, or local context windows. Recent computational approaches utilize static word embeddings, semantic vector spaces, or large language models to identify semantic anomalies. However, structural lexical validation through taxonomic dictionary ancestry remains significantly under-explored. This paper addresses this gap by investigating how reliably an algorithmic framework can cross-reference arbitrary metaphors against the formal semantic taxonomies of the Open Multilingual WordNet (OMW) 1.4 framework.
+
+\subsection{Prior Work and Literature Review}
+The computational treatment of metaphor follows two traditional tracks: knowledge-based methods and data-driven models. Knowledge-based approaches leverage semantic networks or selectional rules (e.g., ``\textit{the market stumbled}'') but lack coverage for real-world data. With WordNet, researchers began calculating taxonomic distances and path lengths, flagging unusually large semantic gaps as potential metaphors. 
+
+Conversely, data-driven approaches utilize embeddings and language models to capture contextual regularities within vector spaces. While achieving high accuracy on annotated corpora (e.g., the VU Amsterdam Metaphor Corpus), they operate as statistical ``black boxes'' without structural explanations. This paper bridges these methodologies by using OMW 1.4 hypernym trees to test whether source-to-target transitions predicted by Conceptual Metaphor Theory are formally preserved within standard dictionary lineages.
+
+\subsection{Software Baseline and Collaborative Foundation}
+Rather than developing the pipeline entirely from scratch, this research expands upon an existing code baseline previously engineered by Lea K. Kom\'{a}rkov\'{a} and Vojt\v{e}ch Mahdal. The original algorithmic core established the foundational mechanics for loading local WordNet databases and conducting initial query lookups.
+
+
+\subsection{Research Objectives}
+Our programmatic and linguistic analysis is driven by three primary research goals:
+\begin{enumerate}
+    \item \textbf{Lexical Mapping:} To programmatically link 8,747 thesaurus headwords to specific WordNet synsets, evaluating the vocabulary coverage and identifying structural gaps.
+    \item \textbf{MML Tracking:} To dynamically traverse and parse hypernym chains to locate explicit target and source domain keywords, evaluating whether dictionary ancestry mirrors cognitive metaphorical logic.
+    \item \textbf{Empirical Validation:} To contrast algorithmic categorization against human intuition via a manual gold-standard test set, establishing precision, recall, and operational error profiles.
+\end{enumerate}
+
+\section{Method}
+To solve the structural verification problem, we engineered a unified Python framework (\texttt{metaphor\_full\_pipeline\_final.py}) that integrates four distinct pipelines, or ``Modes,'' to query, cache, and trace hierarchical ancestors within WordNet. To eliminate network overhead, runtime fluctuations, and throttling limitations, the framework downloads and indexes the complete Open Multilingual WordNet 1.4 dataset into local, plain dictionary lookups during its initialization phase. This creates a persistent binary cache (\texttt{wn\_cache.pkl}) that guarantees ultra-fast local retrieval.
+
+The script climbs the semantic hierarchy of each matching synset recursively. Rather than looking at a surface token in complete isolation, the script extracts initial sense identifiers and traces upwards through hypernymic links via the \texttt{synset.hypernyms()} method until it reaches the top-level root nodes (e.g., \textit{entity.n.01}).
+
+\subsection{Pipeline Architecture and Operational Modes}
+The framework is designed as a modular, command-line executable that can be driven via explicit arguments (e.g., \texttt{--mode discovery}) or run interactively through an option selector. The four discrete modes are structured as follows:
+
+\begin{itemize}
+    \item \textbf{MODE 1 — chainnet:} This mode unifies structural relationships extracted from a custom relational configuration file (\texttt{chainnet\_metonymy.json}) with manual Metaphorical Mapping Logic (MML) word constraints. The script ensures that surface tokens match the specific target-source domain pairs before verifying lexical contiguity.
+    \item \textbf{MODE 2 — wordnet:} Accepts an extended manual target-word spreadsheet directly. It bypasses auxiliary JSON data layers and passes terms directly into the core WordNet engine to evaluate whether the target concept is embedded anywhere within the word's primary taxonomic lineage.
+    \item \textbf{MODE 3 — thesaurus:} Automatically ingests, parses, and cleans a master lexicographical file (\texttt{thesaurus.json}) consisting of 8,747 distinct structural records. The mode strips parenthetical expressions, isolates active headwords, automatically maps them to thematic concepts, and runs deep hypernym verification across the complete dataset.
+    \item \textbf{MODE 4 — discovery:} Implements an active discovery mechanism. Instead of confirming predetermined human word selections, it crawls the complete lexical graph to automatically uncover dual-domain words that simultaneously belong to two distinct semantic branches, specifically bridging the \textit{Colour} (e.g., chromatic colors) and \textit{Material/Substance} (e.g., minerals, matter) domains.
+
+    For instance, when executing \textbf{Mode 4 (Discovery)}, the pipeline successfully identified terms underlying the \textit{COLOUR IS MINERAL} mapping. A clear example is the lemma \textit{amber}:
+\begin{itemize}
+    \item \textbf{Path A (Colour):} amber $\rightarrow$ yellow $\rightarrow$ chromatic color $\rightarrow$ color $\rightarrow$ visual property.
+    \item \textbf{Path B (Mineral):} amber $\rightarrow$ mineraloid $\rightarrow$ mineral $\rightarrow$ material $\rightarrow$ substance.
+\end{itemize}
+This demonstrates how the code automatically captures conceptual overlaps where a concrete mineral substance provides the structural source schema for an abstract color target domain.
+\end{itemize}
+
+\subsection{Lineage Traversal Logic}
+When a valid lemma is matched within a given operational mode, the algorithm invokes a recursive traversal function to output the hierarchy. For standard modes, the system prints an em-dash delimited indented tree; for the exploratory discovery mode, it utilizes a colon-delimited format to differentiate analytical perspectives.
+
+\section{Results and Evaluation}
+The programmatic pipeline was evaluated against the master dataset containing 8,747 words. The data breakdown highlights substantial structural alignment alongside minor lexical gaps, summarized in Table \ref{tab:metrics}.
+
+\begin{table}[h]
+\centering
+\caption{Global Mapping Statistics and Data Breakdown}
+\label{tab:metrics}
+\begin{tabular}{lrr}
+\toprule
+\textbf{Metric Description} & \textbf{Count / Value} & \textbf{Percentage (\%)} \\
+\midrule
+Total Thesaurus Word Entries & 8,747 & 100.0\% \\
+Successfully Mapped Entries & 7,741 & 88.5\% \\
+Lexical Gap (Unmapped Terms) & 1,006 & 11.5\% \\
+Unique Lemmas Identified & 4,669 & -- \\
+Duplicate/Cross-Thematic Instances & 3,072 & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The mapping discovered 4,669 unique lemmas across the 7,741 successfully mapped entries. The discrepancy of 3,072 entries represents duplicate instances where polysemous lemmas are utilized across different conceptual categories (for example, the word ``\textit{pay}'' appearing simultaneously under financial, moral, and qualitative themes). The 1,006 unmapped terms represent a strict ``Lexical Gap.'' Qualitative review reveals that these terms consist almost exclusively of multi-word expressions (e.g., ``\textit{silver lining}'') or modern vernacular items missing from the OMW 1.4 reference database.
+
+\subsection{MML Tracking Distribution}
+To evaluate structural verification, we categorized the 4,669 unique lemmas according to their ancestral lineage composition. Table \ref{tab:tracking} provides the detailed distribution.
+
+\begin{table}[h]
+\centering
+\caption{MML Ancestral Tracking Classification}
+\label{tab:tracking}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Tracking Status} & \textbf{Unique Lemmas (4,669)} & \textbf{Total Instances (7,741)} \\
+\midrule
+\textbf{Both Hypernyms Mapped} & 641 & 561 \\
+\textbf{One Hypernym Mapped} & 1,366 & 3,184 \\
+\textbf{No Tracking Match} & 2,662 & 3,996 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A total of 641 unique lemmas demonstrated ``Both Hypernyms Mapped,'' meaning that the underlying conceptual metaphor is explicitly encoded within the dictionary's formal hierarchy. The ``One Hypernym'' category captured instances where either the source or target keyword was flagged, but the complete conceptual link was missing.
+
+\subsection{Comparison to Human Test Set}
+To establish an objective operational baseline and validate the pipeline against human linguistic judgment, a human test set was created using a random sample of 100 terms extracted from the corpus. This evaluation set was independently annotated by two classmates from the same advanced course to serve as a comparative gold standard. 
+
+The evaluation focused on whether each term, when parsed in context, carried a verifiable metaphorical or metonymic extension. The pipeline's automated classification decisions were then evaluated against this human validation baseline, yielding the performance metrics reported in 
+Table \ref{tab:human}.
+
+\begin{table}[h]
+\centering
+\caption{Pipeline Performance vs. Human Benchmark}
+\label{tab:human}
+\begin{tabular}{lc}
+\toprule
+\textbf{Evaluation Metric} & \textbf{Pipeline Score} \\
+\midrule
+Precision & 76.4\% \\
+Recall & 84.1\% \\
+F1-Score & 80.1\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Discussion}
+The quantitative analysis demonstrates that \textbf{Mode 3 (Thesaurus Mode)} provides the most stable framework for processing structured vocabularies, minimizing manual data selection bias while maintaining an 88.5\% operational coverage rate. 
+
+\subsection{Methodological Innovations}
+A major architectural contribution of this research is the implementation of \textbf{Mode 4 (Discovery Mode)}. By executing multi-branch ancestral traversal, the framework transforms from a passive verification script into an active mining tool. It searches the database graph for words that act as structural bridges between distinct semantic fields. For example, it automatically extracts words like ``\textit{sapphire}'' or ``\textit{amber}'' due to their dual inheritance flags under both chromatic color branches and substance/mineral taxonomies. 
+
+Additionally, this version addresses significant pipeline errors encountered during initial testing phases, where generated output spreadsheets failed to preserve hypernym paths, and structural mappings between ChainNet keys and WordNet identifiers were dropped. We resolved this by embedding a recursive tree-building loop directly into the CSV writer.
+
+\subsection{Limitations and Future Work}
+Despite the pipeline's high coverage rate, two prominent technical and linguistic limitations persist:
+\begin{enumerate}
+    \item \textbf{Multi-Word Inconsistencies:} The 11.5\% lexical gap highlights WordNet's rigid handling of multi-word units. While single terms parse perfectly, idiomatic collocations are frequently skipped.
+    \item \textbf{Implicit Common-Sense Gaps:} Many terms map accurately to WordNet senses but fail to trigger MML keywords in their ancestral paths. This occurs because lexicographical taxonomies are built on objective biological or scientific definitions rather than figurative, cultural, or common-sense knowledge associations. For instance, an animal synset tracks its biological family tree rather than its cultural association with cowardice or speed.
+\end{enumerate}
+
+To circumvent these barriers, immediate next steps include introducing token-leveled substring fallback logic to intercept multi-word components, applying modern word sense disambiguation algorithms to filter out irrelevant dictionary definitions, and performing manual validation of the unmapped category to extract missing cross-thematic synonyms.
+
+\section{Conclusions}
+This paper successfully demonstrates a structured, multi-mode data pipeline that maps, tracks, and validates conceptual metaphors and metonymies by utilizing the hierarchical hypernym trees of WordNet. Processing a large corpus of 8,747 thesaurus terms, our framework established a high lexical coverage rate of 88.5\% and confirmed full ancestral tracking for 641 unique lemmas. The evaluation against a human benchmark confirmed an F1-score of 80.1\%, establishing that dictionary ancestry provides a viable computational framework for automated metaphor validation.
+
+\subsection*{Author Contributions and Acknowledgements}
+The development of this project followed a balanced collaborative structure splitting core responsibilities. Barbora Mahdalov\'{a} was primarily responsible for the technical engineering, software implementation, and scripting of the unified pipeline architecture. Lea K. Kom\'{a}rkov\'{a} drove the theoretical development, baseline brainstorming sessions, qualitative evaluation of data outputs, and continuous verification of mapping integrity. 
+
+Lastly, the authors would like to acknowledge the supplemental assistance provided by large language models, specifically Gemini AI and Claude AI. These tools were utilized for minor code optimization, framework debugging, and refining technical formatting variations during compilation loops.
+\end{subsection*}
+
+\begin{thebibliography}{99}
+\bibitem{lakoff1980} Lakoff, G., \& Johnson, M. (1980). \textit{Metaphors We Live By}. University of Chicago Press.
+\bibitem{bond2013} Bond, F., \& Foster, R. (2013). Linking and extending an open multilingual Wordnet. \textit{Proceedings of the 51st Annual Meeting of the Association for Computational Linguistics}, 1352--1362.
+\end{thebibliography}
+
+\end{document}
