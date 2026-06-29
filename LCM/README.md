@@ -7,7 +7,7 @@ This project implements a unified data pipeline developed for the Advanced Compu
 * `metaphor_full_pipeline_final.py` - The main unified Python script containing all 4 operational modes.
 * `chainnet_metonymy.json` - Configuration file containing structural relations for Mode 1.
 * `thesaurus.json` - Master lexicographical database containing 8,747 entries used for Mode 3.
-* `LCM_final_report.tex` - The complete LaTeX source code for the 6–10 page final report.
+* `LCM_final_report.pdf` - The complete LaTeX source code for the 6–10 page final report.
 * `final_report_latex.txt` - The complete code in LaTeX fo my report.
 * `README.md` - This file (project documentation and execution guide).
 
