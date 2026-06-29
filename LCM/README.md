@@ -18,3 +18,9 @@ Before running the pipeline, ensure you have the `wn` library installed:
 pip install wn
 
 python metaphor_full_pipeline_final.py --mode chainnet
+
+python metaphor_full_pipeline_final.py --mode wordnet
+
+python metaphor_full_pipeline_final.py --mode thesaurus
+
+python metaphor_full_pipeline_final.py --mode discovery
