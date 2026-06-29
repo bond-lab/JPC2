@@ -8,7 +8,6 @@ This project implements a unified data pipeline developed for the Advanced Compu
 * `chainnet_metonymy.json` - Configuration file containing structural relations for Mode 1.
 * `thesaurus.json` - Master lexicographical database containing 8,747 entries used for Mode 3.
 * `metaphor_report.tex` - The complete LaTeX source code for the 6–10 page final report.
-* `metaphor_report.tex` - The complete LaTeX source code for the 6–10 page final report.
 * `final_report_latex.txt` - The complete code in LaTeX fo my report.
 * `README.md` - This file (project documentation and execution guide).
 
