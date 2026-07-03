@@ -1,0 +1,57 @@
+---Total accuracy---
+56.20% correct (798/1420)
+
+
+---Accuracy without x---
+64.39% correct (736/1143)
+
+---F1 Summary---
+Type        Precision     Recall         F1
+Macro           0.585      0.573      0.555
+Micro           0.733      0.733      0.733
+
+
+>>> Evaluating Context 1 <<<
+/home/sone/JSP3/tasks/wsd-c/.venv/lib/python3.12/site-packages/nltk/corpus/reader/wordnet.py:1618: UserWarning: No WordNet synset found for pos=n at offset=77000082.
+  warnings.warn(f"No WordNet synset found for pos={pos} at offset={offset}.")
+
+---Total accuracy---
+56.97% correct (809/1420)
+
+
+---Accuracy without x---
+65.18% correct (745/1143)
+
+---F1 Summary---
+Type        Precision     Recall         F1Macro           0.648      0.676      0.632
+Micro           0.746      0.746      0.746
+
+
+>>> Evaluating Context 2 <<<
+
+---Total accuracy---
+58.31% correct (828/1420)
+
+
+---Accuracy without x---
+66.23% correct (757/1143)
+
+---F1 Summary---
+Type        Precision     Recall         F1
+Macro           0.655      0.686      0.633
+Micro           0.744      0.744      0.744
+
+
+>>> Evaluating Context 3 <<<
+
+---Total accuracy---
+56.76% correct (806/1420)
+
+
+---Accuracy without x---
+64.83% correct (741/1143)
+
+---F1 Summary---
+Type        Precision     Recall         F1
+Macro           0.535      0.602      0.554
+Micro           0.736      0.736      0.736
