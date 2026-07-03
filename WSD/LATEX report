@@ -1,0 +1,446 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage[colorlinks=true]{hyperref}
+\hypersetup{
+    citecolor=OliveGreen, % a very dark green
+    linkcolor=NavyBlue,
+    urlcolor=NavyBlue
+  }
+ \usepackage{url}
+ \usepackage{booktabs}
+ \usepackage{placeins}
+
+\title{Word Sense Disambiguation and Multi-Word Expressions}
+\author{%
+  Vira Yurchenko \\
+  \href{mailto:yurcvi00@upol.cz}{yurcvi00@upol.cz}%
+  \\
+ JCP2: WSD
+  }
+\date{June 2026}
+\begin{document}
+\maketitle
+
+\section{Introduction}
+\label{sec:introduction}
+The goal of this project is to study the use of a running locally large language model for automatic semantic annotation of a corpus. The system brings together lexical data from WordNet with how a local Ollama model thinks based on context. For each concept in the corpus, the model picks the most fitting WordNet sense, assigns special semantic labels when no matching synset is found and scores the sentiment of the identified concept. Also the system automatically manages multi-word expressions and keeps detailed statistics for later analysis.\\
+
+This project evaluates how the amount of surrounding context affects disambiguation quality. To do this, annotations generated from several window setups are compared with human-annotated gold standard data. The alignment quality is measured using a varied evaluation results that includes accuracy, precision, recall, F1-score.\\
+
+This topic has already been studied by many researchers. Traditional WSD systems rely on supervised machine learning or methods that use lexical resources such as WordNet. I wanted to explore how Large Language Models can be applied to a real Natural Language Processing task. WSD is a challenging problem since the same word can have different meanings depending on the context. I was interested in finding out whether a locally running LLM could correctly identify these meanings using WordNet as a lexical resource. Another reason for this project was to gain practical experience with prompt engineering. \\
+
+\section{Method}
+First, the program reads the input corpus and extracts the concepts that need to be annotated. For each concept it searches WordNet and extracts several possible meanings (synsets). If no suitable WordNet synonym exists, the system can select one of several predefined semantic labels. The program then creates a context for the target concept, including the current sentence and surrounding sentences (it could be from 0 to 3 sentences). The context, target word and possible meanings are passed to LLM through Ollama. The model selects the most appropriate meaning based on the context and returns the result in JSON format. \\
+
+The MWE has two strateges of processing in this code. The main challenge here is that phrases like "no longer" or "find out" have a unique meaning only when the words are together. The script finds a phrase in a file, it splits the phrase and extracts each dictionary definition for individual words. The model is then given this huge list. LLM analyzes the context, understands that the words belong together as one unit and actively ignore all irrelevant meanings of separate words.\\
+
+The second option for MWE processing: the script extracts the target multi-word expression from the input file. It requires WordNet only for the exact phrase ("find out"), without splitting it into individual tokens. The LLM receives a highly targeted list of just 1-3 valid definitions, not plenty of irrelevant ones and selects the most accurate shade of meaning based on the context.\\
+
+After assigning semantic labels, the system evaluates the lexical sentiment of each concept on a scale from -100 to +100. Finally, all annotations are saved to a new JSON file. To evaluate the approach I run the annotation pipeline with different context sizes (0, 1, 2 and 3 sentences) and compare the results using accuracy, precision, recall and F1-score metrics.\\
+
+\section{Results and Evaluation} 
+Word Sense Disambiguation. 
+The following tables show the results of three different language models evaluated on a test set of 100 sentences. This experiment was performed with additional context, that means such structure: some sentences - word - some sentences.
+
+\begin{table}[h]
+\centering
+\caption{WSD. Results of the Gemma4:e4b model.}
+\label{tab:gemma_results}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Context} &
+\textbf{Accuracy} &
+\textbf{Accuracy} &
+\multicolumn{3}{c}{\textbf{Macro}} &
+\textbf{Micro} \\
+\cmidrule(lr){4-6}
+\textbf{Size} &
+\textbf{(Total)} &
+\textbf{(Without x)} &
+\textbf{Precision} &
+\textbf{Recall} &
+\textbf{F1} &
+\textbf{F1} \\
+\midrule
+0 & 56.20\% & 64.39\% & 0.585 & 0.573 & 0.555 & 0.733 \\
+1 & 56.69\% & 64.83\% & 0.580 & 0.642 & 0.594 & 0.736 \\
+2 & 56.62\% & 64.57\% & 0.572 & 0.611 & 0.568 & 0.734 \\
+3 & 56.76\% & 65.18\% & 0.695 & 0.718 & 0.679 & 0.746 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+
+\begin{table}[h]
+\centering
+\caption{WSD. Results of the Mistral-nemo:12b model.}
+\label{tab:mist_results}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Context} &
+\textbf{Accuracy} &
+\textbf{Accuracy} &
+\multicolumn{3}{c}{\textbf{Macro}} &
+\textbf{Micro} \\
+\cmidrule(lr){4-6}
+\textbf{Size} &
+\textbf{(Total)} &
+\textbf{(Without x)} &
+\textbf{Precision} &
+\textbf{Recall} &
+\textbf{F1} &
+\textbf{F1} \\
+\midrule
+0 & 50.77\% & 61.77\% & 0.453 & 0.508 & 0.429 & 0.694 \\
+1 & 51.62\% & 62.90\% & 0.404 & 0.493 & 0.398 & 0.693 \\
+2 & 51.13\% & 62.64\% & 0.454 & 0.586 & 0.466 & 0.692 \\
+3 & 51.83\% & 63.69\% & 0.451 & 0.556 & 0.451 & 0.702 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[h]
+\centering
+\caption{WSD. Results of Qwen2.5:7b model.}
+\label{tab:qw_results}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Context} &
+\textbf{Accuracy} &
+\textbf{Accuracy} &
+\multicolumn{3}{c}{\textbf{Macro}} &
+\textbf{Micro} \\
+\cmidrule(lr){4-6}
+\textbf{Size} &
+\textbf{(Total)} &
+\textbf{(Without x)} &
+\textbf{Precision} &
+\textbf{Recall} &
+\textbf{F1} &
+\textbf{F1} \\
+\midrule
+0 & 49.23\% & 59.14\% & 0.479 & 0.446 & 0.410 & 0.691 \\
+1 & 47.68\% & 57.48\% & 0.554 & 0.529 & 0.493 & 0.673 \\
+2 & 47.96\% & 57.92\% & 0.589 & 0.534 & 0.508 & 0.679 \\
+3 & 47.39\% & 57.13\% & 0.500 & 0.490 & 0.462 & 0.684 \\
+\bottomrule
+\end{tabular}
+\end{table} 
+
+The next tables show the results of the same language models evaluated on a test set of 100 sentences. However I tested this experiment without additional context after the word, that means such structure: some sentences - word.
+
+\begin{table}[h]
+\centering
+\caption{WSD. Results of the Gemma4:e4b model.}
+\label{tab:gemma_results}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Context} &
+\textbf{Accuracy} &
+\textbf{Accuracy} &
+\multicolumn{3}{c}{\textbf{Macro}} &
+\textbf{Micro} \\
+\cmidrule(lr){4-6}
+\textbf{Size} &
+\textbf{(Total)} &
+\textbf{(Without x)} &
+\textbf{Precision} &
+\textbf{Recall} &
+\textbf{F1} &
+\textbf{F1} \\
+\midrule
+0 & 56.20\% & 64.39\% & 0.585 & 0.573 & 0.555 & 0.733 \\
+1 & 56.97\% & 65.18\% & 0.648 & 0.676 & 0.632 & 0.746 \\
+2 & 58.31\% & 66.23\% & 0.655 & 0.686 & 0.633 & 0.744 \\
+3 & 56.76\% & 64.83\% & 0.535 & 0.602 & 0.554 & 0.736 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[h]
+\centering
+\caption{WSD. Results of the Mistral-nemo:12b model.}
+\label{tab:misr_results}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Context} &
+\textbf{Accuracy} &
+\textbf{Accuracy} &
+\multicolumn{3}{c}{\textbf{Macro}} &
+\textbf{Micro} \\
+\cmidrule(lr){4-6}
+\textbf{Size} &
+\textbf{(Total)} &
+\textbf{(Without x)} &
+\textbf{Precision} &
+\textbf{Recall} &
+\textbf{F1} &
+\textbf{F1} \\
+\midrule
+0 & 50.77\% & 61.77\% & 0.453 & 0.508 & 0.429 & 0.694 \\
+1 & 50.99\% & 62.29\% & 0.448 & 0.547 & 0.449 & 0.700 \\
+2 & 51.62\% & 62.99\% & 0.455 & 0.554 & 0.459 & 0.703 \\
+3 & 51.06\% & 62.47\% & 0.414 & 0.511 & 0.415 & 0.698 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[h]
+\centering
+\caption{WSD. Results of Qwen2.5:7b model.}
+\label{tab:qwen_results}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Context} &
+\textbf{Accuracy} &
+\textbf{Accuracy} &
+\multicolumn{3}{c}{\textbf{Macro}} &
+\textbf{Micro} \\
+\cmidrule(lr){4-6}
+\textbf{Size} &
+\textbf{(Total)} &
+\textbf{(Without x)} &
+\textbf{Precision} &
+\textbf{Recall} &
+\textbf{F1} &
+\textbf{F1} \\
+\midrule
+0 & 49.23\% & 59.14\% & 0.479 & 0.446 & 0.410 & 0.691 \\
+1 & 48.17\% & 57.66\% & 0.547 & 0.556 & 0.521 & 0.687 \\
+2 & 48.38\% & 58.44\% & 0.518 & 0.571 & 0.502 & 0.691 \\
+3 & 48.73\% & 58.53\% & 0.516 & 0.579 & 0.519 & 0.683 \\
+\bottomrule
+\end{tabular}
+\end{table} 
+\FloatBarrier
+
+In the MWE problem each language model was given a list of possible meanings for the entire multi-word expression. The models were evaluated on the same test set of 100 sentences using different context sizes (0, 1, 2, and 3 surrounding sentences).
+
+\begin{table}[h]
+\centering
+\caption{MWE. Results of the Gemma4:e4b model.}
+\label{tab:gemma_results}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Context} &
+\textbf{Accuracy} &
+\textbf{Accuracy} &
+\multicolumn{3}{c}{\textbf{Macro}} &
+\textbf{Micro} \\
+\cmidrule(lr){4-6}
+\textbf{Size} &
+\textbf{(Total)} &
+\textbf{(Without x)} &
+\textbf{Precision} &
+\textbf{Recall} &
+\textbf{F1} &
+\textbf{F1} \\
+\midrule
+0 & 57.61\% & 53.63\% & 0.603 & 0.596 & 0.590 & 0.720 \\
+1 & 59.58\% & 55.82\% & 0.583 & 0.570 & 0.566 & 0.727 \\
+2 & 57.89\% & 53.94\% & 0.572 & 0.562 & 0.558 & 0.725 \\
+3 & 56.55\% & 53.19\% & 0.548 & 0.523 & 0.522 & 0.714 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[h]
+\centering
+\caption{MWE. Results of the Mistral-nemo:12b model.}
+\label{tab:mistr_results}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Context} &
+\textbf{Accuracy} &
+\textbf{Accuracy} &
+\multicolumn{3}{c}{\textbf{Macro}} &
+\textbf{Micro} \\
+\cmidrule(lr){4-6}
+\textbf{Size} &
+\textbf{(Total)} &
+\textbf{(Without x)} &
+\textbf{Precision} &
+\textbf{Recall} &
+\textbf{F1} &
+\textbf{F1} \\
+\midrule
+0 & 52.18\% & 54.16\% & 0.462 & 0.596 & 0.475 & 0.666 \\
+1 & 53.87\% & 56.61\% & 0.440 & 0.616 & 0.463 & 0.681 \\
+2 & 51.83\% & 54.16\% & 0.445 & 0.595 & 0.468 & 0.668 \\
+3 & 51.83\% & 54.59\% & 0.455 & 0.615 & 0.479 & 0.669 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[h]
+\centering
+\caption{MWE. Results of Qwen2.5:7b model.}
+\label{tab:qwa_results}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Context} &
+\textbf{Accuracy} &
+\textbf{Accuracy} &
+\multicolumn{3}{c}{\textbf{Macro}} &
+\textbf{Micro} \\
+\cmidrule(lr){4-6}
+\textbf{Size} &
+\textbf{(Total)} &
+\textbf{(Without x)} &
+\textbf{Precision} &
+\textbf{Recall} &
+\textbf{F1} &
+\textbf{F1} \\
+\midrule
+0 & 49.93\% & 48.21\% & 0.488 & 0.478 & 0.438 & 0.669 \\
+1 & 48.80\% & 46.98\% & 0.428 & 0.485 & 0.422 & 0.659 \\
+2 & 49.65\% & 48.64\% & 0.485 & 0.479 & 0.445 & 0.658 \\
+3 & 49.86\% & 48.82\% & 0.441 & 0.471 & 0.428 & 0.655 \\
+\bottomrule
+\end{tabular}
+\end{table} 
+
+In this experiment, each language model received between one and three candidate definitions for the entire multi-word expression. These definitions were selected from WordNet and showed the most likely meanings of the phrase. The models were then asked to choose the most appropriate definition based on the given context.
+
+\begin{table}[h]
+\centering
+\caption{MWE. Results of the Gemma4:e4b model.}
+\label{tab:gemma_results}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Context} &
+\textbf{Accuracy} &
+\textbf{Accuracy} &
+\multicolumn{3}{c}{\textbf{Macro}} &
+\textbf{Micro} \\
+\cmidrule(lr){4-6}
+\textbf{Size} &
+\textbf{(Total)} &
+\textbf{(Without x)} &
+\textbf{Precision} &
+\textbf{Recall} &
+\textbf{F1} &
+\textbf{F1} \\
+\midrule
+0 & 59.08\% & 55.03\% & 0.659 & 0.641 & 0.635 & 0.725 \\
+1 & 57.61\% & 52.94\% & 0.571 & 0.533 & 0.542 & 0.723 \\
+2 & 58.03\% & 54.07\% & 0.598 & 0.587 & 0.583 & 0.730 \\
+3 & 57.04\% & 53.37\% & 0.585 & 0.558 & 0.564 & 0.718 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[h]
+\centering
+\caption{MWE. Results of the Mistral-nemo:12b model.}
+\label{tab:misn_results}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Context} &
+\textbf{Accuracy} &
+\textbf{Accuracy} &
+\multicolumn{3}{c}{\textbf{Macro}} &
+\textbf{Micro} \\
+\cmidrule(lr){4-6}
+\textbf{Size} &
+\textbf{(Total)} &
+\textbf{(Without x)} &
+\textbf{Precision} &
+\textbf{Recall} &
+\textbf{F1} &
+\textbf{F1} \\
+\midrule
+0 & 52.18\% & 54.16\% & 0.498 & 0.562 & 0.496 & 0.675 \\
+1 & 51.90\% & 54.51\% & 0.434 & 0.564 & 0.451 & 0.672 \\
+2 & 51.41\% & 54.07\% & 0.428 & 0.565 & 0.438 & 0.665 \\
+3 & 51.55\% & 54.07\% & 0.418 & 0.591 & 0.426 & 0.665 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[h]
+\centering
+\caption{MWE. Results of Qwen2.5:7b model.}
+\label{tab:qwe_results}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Context} &
+\textbf{Accuracy} &
+\textbf{Accuracy} &
+\multicolumn{3}{c}{\textbf{Macro}} &
+\textbf{Micro} \\
+\cmidrule(lr){4-6}
+\textbf{Size} &
+\textbf{(Total)} &
+\textbf{(Without x)} &
+\textbf{Precision} &
+\textbf{Recall} &
+\textbf{F1} &
+\textbf{F1} \\
+\midrule
+0 & 49.65\% & 48.29\% & 0.499 & 0.529 & 0.455 & 0.671 \\
+1 & 48.17\% & 46.98\% & 0.413 & 0.496 & 0.422 & 0.650 \\
+2 & 48.80\% & 47.68\% & 0.432 & 0.503 & 0.448 & 0.657 \\
+3 & 48.45\% & 47.68\% & 0.456 & 0.468 & 0.407 & 0.656 \\
+\bottomrule
+\end{tabular}
+\end{table} 
+
+
+\begin{table}[H]
+\centering
+\caption{Execution time of the language models for each experiment.}
+\label{tab:execution_time}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Experiment} & \textbf{Gemma4:e4b} & \textbf{Mistral-nemo:12b} & \textbf{Qwen2.5:7b} \\
+\midrule
+WSD (before \& after) & 8:53:18 & 5:57:23 & 4:26:06 \\
+WSD (before only) & 8:49:44 & 5:50:11 & 4:21:17 \\
+MWE (all definitions) & 3 days, 2:05:20 & 4 days, 21:45:07 & 2 days, 18:54:50 \\
+MWE (top 1--3 definitions) & 3 days, 0:57:35 & 4 days, 21:07:31 & 2 days, 18:49:03 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\FloatBarrier
+
+\section{Discussion}
+
+I would like to start with WSD results. One of the main questions was "Does the additional context help for understanding the meaning of the word?". For all models, except Qwen2.5:7b, additional context helps for better understanding the meaning. However the difference is not as big as it would be expected, it is about 1-3\%. The model Qwen2.5:7b has opposite results, with increasing the context the accuracy is getting lower. I guess, that the model is just getting confused with bigger information.\\
+
+The model Gemma4:e4b achieved the best result. It reached the highest total accuracy (56.76\%), the highest accuracy without the x labels (65.18\%), and the highest Macro F1 (0.679) and Micro F1 (0.746). Therefore Gemma4:e4b is able to make better use of additional contextual information for word sense disambiguation. It is also the slowest model.\\
+Then goes Mistral-nemo:12b. The highest total accuracy (51.83\%) and Micro F1 (0.702) were obtained with a context size of three, while the best Macro F1 (0.466) was achieved with a context size of two.\\
+The Qwen2.5:7b model performed the worst among the three models. Increasing the context size did not always improve results, and in some cases, performance actually decreased. That means, that additional context is not equally beneficial for each language model.\\
+
+In the next experiment I used a different context structure. Instead of providing both the preceding and following sentences around the target word, the model received only the sentences before the target word. In other words, the context had the structure preceding sentences - target word.\\
+Compared with the previous experiment, the effect of additional context is different for each model. Gemma4:e4b achieved its best performance with a context size of 2, reaching 58.31\% total accuracy, 66.23\% accuracy without x, and a Macro F1 score of 0.633. Mistral-nemo:12b showed only a small improvement, with the best results obtained for a context size of 2 (51.62\% total accuracy and Macro F1 = 0.459). Qwen2.5:7b did not benefit from the additional preceding context and its best total accuracy (49.23\%) was achieved without any extra context.\\
+
+In the first MWE experiment, where the model was given a list of possible meanings, among the evaluated models Gemma4:e4b achieved the best overall result. Its highest total accuracy (59.58\%) and Micro F1 (0.727) were received with a context size of 1, while the highest Macro F1 (0.590) was achieved without additional context. Mistral-nemo:12b produced lower but relatively stable results across different context sizes, with the best total accuracy (53.87\%) achieved for a context size of 1 and the best Macro F1 (0.479) for a context size of 3. Qwen2.5:7b showed the lowest result.\\
+
+In the second experiment each language model received between one and three variants of meanings for the multi-word expression. The results show that Gemma4:e4b again achieved the best overall performance. Its highest total accuracy (59.08\%) and Macro F1 (0.635) were obtained without additional context, while the highest Micro F1 (0.730) was achieved with a context size of 2. Mistral-nemo:12b produced more stable results across different context sizes, although the differences were relatively small. Qwen2.5:7b showed the lowest performance and increasing the context size did not lead to consistent improvements.\\
+
+Comparing two experiments with a minimal number of examples shows that reducing the number of definition variants generally improves the result of language models.\\
+Gemma4:e4b performs better, when it receives only 1-3 most appropriate options. For example, Macro F1 increased from 0.590 to 0.635, and the maximum overall accuracy increased slightly from 57.61\% to 59.08\%. This suggests that the model performs better, when it doesn't have to choose from a large number of options.\\
+Mistral-nemo:12b shows small changes. In the second experiment Macro F1 increased from 0.479 to 0.496, but the differences in accuracy and Micro F1 were small. For this model reducing the number of determinations has no significant effect.\\
+Qwen2.5:7b also slightly improved the results when using only 1–3 definitions. Macro F1 increased from 0.438 to 0.455, but overall accuracy almost unchanged. That means, that the model benefits slightly from narrowing the candidate list, but the improvement remains limited.\\
+
+The execution times for all models and experiments were also compared. The WSD experiments were much faster than the MWE experiments because the MWE prompts contained lists of possible phrase meanings, making each request longer and more computationally expensive. Among all models, Qwen2.5:7b was the fastest, requiring approximately 4.5 hours for the WSD experiments and approximately 2 days and 19 hours for the MWE experiments. Gemma4:e4b required approximately 9 hours for WSD and approximately 3 days for MWE. Mistral-nemo:12b was the slowest model, requiring approximately 6 hours for WSD and almost 5 days for each MWE experiment. Using only the top 1-3 candidate definitions slightly reduced execution time compared to providing the full list of definitions, but the improvement was relatively small.\\
+
+Because of limited time and computational resources, I evaluated the models on a subset of 100 manually annotated sentences. In future work, I would like to evaluate the system on the complete corpus, test additional language models, and experiment with different prompting strategies.
+
+\section{Conclusion}
+The purpose of this project is to explore whether a local LLM can automatically assign the correct WordNet sense to words in a text and estimate their lexical sentiment. Another goal is to investigate how the amount of surrounding context influences the quality of semantic annotation. By comparing the results obtained with different context window sizes, it is possible to better understand the strengths and limitations of this approach.\\
+Experiments showed that the choice of language model has a significant impact on result. Among the evaluated models, Gemma4:e4b consistently demonstrated the best results in both word disambiguation experiments and multi-word expressions. Additional context improved performance for some models, particularly Gemma4:e4b , but the effect depended on the model and task. Experiments also showed that providing only one to three carefully selected definition options for a multi-word expression generally produced better results than using a longer list of possible meanings.\\
+In conclusion, the project demonstrates that local large language models can be successfully applied to semantic annotation and word disambiguation. The results also show that both the choice of language model and the way contextual and lexical information is represented have a significant impact on the quality of annotation.\\
+
+
+\end{document}
