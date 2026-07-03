@@ -1,0 +1,55 @@
+---Total accuracy---
+47.68% correct (677/1420)
+
+---Accuracy without x---                                                                                           
+58.79% correct (672/1143)
+
+---F1 Summary---
+Type        Precision     Recall         F1
+Macro           0.418      0.469      0.411
+Micro           0.670      0.670      0.670
+
+
+>>> Evaluating Context 1 <<<
+
+---Total accuracy---
+46.83% correct (665/1420)
+
+
+---Accuracy without x---
+57.83% correct (661/1143)
+
+---F1 Summary---
+Type        Precision     Recall         F1
+Macro           0.403      0.514      0.411
+Micro           0.658      0.658      0.658
+
+
+>>> Evaluating Context 2 <<<
+
+---Total accuracy---
+47.68% correct (677/1420)
+
+
+---Accuracy without x---
+58.79% correct (672/1143)
+
+---F1 Summary---
+Type        Precision     Recall         F1
+Macro           0.453      0.551      0.462
+Micro           0.673      0.673      0.673
+
+
+>>> Evaluating Context 3 <<<
+
+---Total accuracy---
+47.18% correct (670/1420)
+
+
+---Accuracy without x---
+58.44% correct (668/1143)
+
+---F1 Summary---
+Type        Precision     Recall         F1
+Macro           0.459      0.513      0.457
+Micro           0.674      0.674      0.674
