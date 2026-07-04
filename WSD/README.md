@@ -19,8 +19,11 @@ FINAL_report.pdf - pdf file with the final report.
 
 LATEX report - the file with report's code from Latex.
 
+CODE - the folder with all the codes. (WSD, MWE problems. In the MWE the main differences between the codes are the prompts and a few lines of code). 
+
 * All result files contain: total accuracy and other metrics for every model, statistics and tagged files.
 
 #### How to run the code:
 Before running the code with certain model, you should install this version of model in the server.
+
 
